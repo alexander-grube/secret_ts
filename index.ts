@@ -10,10 +10,11 @@ const client = new Client({
 })
 await client.connect()
 
-async function getSecrets(): Promise<Response> {
+async function getSecret(req: Request): Promise<Response> {
+    let id = new URL(req.url).searchParams.get("id");
     let secretReponses: SecretResponse[] = [];
     try {
-        const res = await client.query("SELECT * FROM secret_message");
+        const res = await client.query("SELECT * FROM secret_message WHERE id = $1", [id]);
         secretReponses = res.rows.map(row => ({
             id: row.id,
             message: row.message,
@@ -78,10 +79,10 @@ const server = Bun.serve({
     fetch(req) {
         const url = new URL(req.url).pathname.slice(1);
         switch (url) {
-            case "secret":
+            case "bun-secret/secret":
                 switch (req.method) {
                     case "GET":
-                        return getSecrets();
+                        return getSecret(req);
                     case "POST":
                         return postSecret(req);
                     default:
