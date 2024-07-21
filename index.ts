@@ -27,6 +27,13 @@ async function getSecret(req: Request): Promise<Response> {
         });
     }
 
+    if (secretReponses.length === 0) {
+        return new Response("Not Found", {
+            status: 404,
+            statusText: "Not Found",
+        });
+    }
+
     return new Response(JSON.stringify(secretReponses), {
         status: 200,
         statusText: "OK",
